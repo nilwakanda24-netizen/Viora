@@ -1,0 +1,24 @@
+# Core dependencies
+tensorflow==2.15.0
+fastapi==0.104.1
+uvicorn==0.24.0
+python-multipart==0.0.6
+scikit-learn==1.3.2
+numpy==1.26.2
+pillow==10.1.0
+pydantic==2.5.0
+
+# OCR i PDF
+pytesseract==0.3.10
+PyPDF2==3.0.1
+pdf2image==1.16.3
+
+# Optional (per funcionalitats avançades)
+torch==2.1.0
+torchvision==0.16.0
+opencv-python==4.8.1.78
+pandas==2.1.3
+xgboost==2.0.2
+matplotlib==3.8.2
+seaborn==0.13.0
+tqdm==4.66.1

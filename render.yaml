@@ -1,0 +1,14 @@
+# Configuració per Render.com
+services:
+  - type: web
+    name: viora-medical-ai
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python viora_ultimate.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: PYTHONUNBUFFERED
+        value: 1
+    healthCheckPath: /
+    autoDeploy: true

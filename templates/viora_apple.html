@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viora - Medical AI Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --apple-white: #ffffff;
+            --apple-gray-50: #fafafa;
+            --apple-gray-100: #f5f5f7;
+            --apple-gray-200: #e8e8ed;
+            --apple-gray-300: #d2d2d7;
+            --apple-gray-400: #86868b;
+            --apple-gray-900: #1d1d1f;
+            --apple-blue: #0071e3;
+            --apple-green: #30d158;
+            --apple-orange: #ff9500;
+            --apple-red: #ff3b30;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 25px rgba(0,0,0,0.15);
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+            background: var(--apple-gray-50);
+            color: var(--apple-gray-900);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* Navbar estil Apple */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: saturate(180%) blur(20px);
+            border-bottom: 1px solid var(--apple-gray-200);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 max(20px, env(safe-area-inset-left));
+        }
+        
+        .navbar-brand {
+            font-size: 21px;
+            font-weight: 600;
+            color: var(--apple-gray-900);
+            letter-spacing: -0.5px;
+        }
+        
+        .navbar-badge {
+            display: inline-block;
+            background: var(--apple-blue);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+            text-transform: uppercase;
+        }
+        
+        /* Container principal */
+        .container {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 80px 20px 60px;
+        }
+        
+        /* Hero section */
+        .hero {
+            text-align: center;
+            padding: 60px 0;
+        }
+        
+        .hero h1 {
+            font-size: 56px;
+            font-weight: 700;
+            letter-spacing: -1.5px;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--apple-gray-900) 0%, var(--apple-gray-400) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .hero p {
+            font-size: 21px;
+            color: var(--apple-gray-400);
+            font-weight: 400;
+            margin-bottom: 40px;
+        }
+        
+        /* Disclaimer */
+        .disclaimer {
+            background: #fff9e6;
+            border: 1px solid #ffe066;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin: 0 auto 60px;
+            max-width: 700px;
+            display: flex;
+            align-items: start;
+            gap: 12px;
+        }
+        
+        .disclaimer-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        
+        .disclaimer-text {
+            font-size: 14px;
+            color: #856404;
+            line-height: 1.5;
+        }
+        
+        /* Cards */
+        .card {
+            background: var(--apple-white);
+            border-radius: 18px;
+            padding: 40px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--apple-gray-200);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        
+        .card-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            letter-spacing: -0.5px;
+        }
+        
+        /* Upload zones */
+        .upload-zone {
+            border: 2px dashed var(--apple-gray-300);
+            border-radius: 12px;
+            padding: 48px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: var(--apple-gray-50);
+        }
+        
+        .upload-zone:hover {
+            border-color: var(--apple-blue);
+            background: var(--apple-white);
+        }
+        
+        .upload-zone.active {
+            border-color: var(--apple-blue);
+            background: #e3f2fd;
+        }
+        
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.6;
+        }
+        
+        .upload-text {
+            font-size: 17px;
+            font-weight: 500;
+            color: var(--apple-gray-900);
+            margin-bottom: 8px;
+        }
+        
+        .upload-subtext {
+            font-size: 14px;
+            color: var(--apple-gray-400);
+        }
+        
+        .file-name {
+            margin-top: 12px;
+            padding: 8px 16px;
+            background: var(--apple-green);
+            color: white;
+            border-radius: 20px;
+            display: inline-block;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        /* Input grid */
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 24px;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .input-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--apple-gray-400);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .input-field {
+            padding: 12px 16px;
+            border: 1px solid var(--apple-gray-300);
+            border-radius: 10px;
+            font-size: 17px;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            background: var(--apple-white);
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: var(--apple-blue);
+            box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.1);
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 14px 32px;
+            border: none;
+            border-radius: 980px;
+            font-size: 17px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        
+        .btn-primary {
+            background: var(--apple-blue);
+            color: white;
+            width: 100%;
+            margin-top: 32px;
+            padding: 16px;
+            font-size: 19px;
+            font-weight: 600;
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            background: #0077ed;
+            transform: scale(1.02);
+        }
+        
+        .btn-primary:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+        
+        .btn-primary:disabled {
+            background: var(--apple-gray-300);
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* Loading */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+        }
+        
+        .loading.active {
+            display: block;
+        }
+        
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 3px solid var(--apple-gray-200);
+            border-top-color: var(--apple-blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            font-size: 17px;
+            color: var(--apple-gray-400);
+            font-weight: 500;
+        }
+        
+        /* Results */
+        .results {
+            display: none;
+            margin-top: 40px;
+        }
+        
+        .results.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .results-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .results-title {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+        
+        /* Risk badge */
+        .risk-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 980px;
+            font-size: 17px;
+            font-weight: 600;
+            margin: 20px 0;
+        }
+        
+        .risk-baix {
+            background: #d1f4e0;
+            color: #0d7a3f;
+        }
+        
+        .risk-moderat {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .risk-alt {
+            background: #ffe5e5;
+            color: #c41e3a;
+        }
+        
+        /* Result cards */
+        .result-card {
+            background: var(--apple-white);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 20px;
+            border: 1px solid var(--apple-gray-200);
+        }
+        
+        .result-card-title {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .result-card-icon {
+            font-size: 24px;
+        }
+        
+        .result-card-content {
+            font-size: 17px;
+            line-height: 1.6;
+        }
+        
+        .result-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .result-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--apple-gray-200);
+            display: flex;
+            align-items: start;
+            gap: 12px;
+        }
+        
+        .result-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .result-list-icon {
+            color: var(--apple-blue);
+            font-size: 18px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        
+        /* Download button */
+        .btn-download {
+            background: var(--apple-gray-900);
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 24px;
+        }
+        
+        .btn-download:hover {
+            background: #2d2d2f;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 40px;
+            }
+            
+            .hero p {
+                font-size: 17px;
+            }
+            
+            .card {
+                padding: 24px;
+            }
+            
+            .input-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Utilities */
+        .hidden {
+            display: none !important;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .mt-4 {
+            margin-top: 32px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-brand">
+            🏥 Viora
+            <span class="navbar-badge">AI</span>
+        </div>
+    </nav>
+    
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="hero">
+            <h1>Medical AI Platform</h1>
+            <p>Anàlisi intel·ligent de radiografies i analítiques de sang</p>
+        </div>
+        
+        <!-- Disclaimer -->
+        <div class="disclaimer">
+            <div class="disclaimer-icon">⚠️</div>
+            <div class="disclaimer-text">
+                <strong>Important:</strong> Aquesta és una eina de suport clínic per a fins educatius. 
+                No substitueix el diagnòstic d'un metge professional. Sempre consulta amb personal mèdic qualificat.
+            </div>
+        </div>
+        
+        <!-- Analysis Form -->
+        <form id="analysisForm">
+            <!-- Radiografia -->
+            <div class="card">
+                <h2 class="card-title">📸 Radiografia de Tòrax</h2>
+                <div class="upload-zone" id="xrayZone" onclick="document.getElementById('xrayFile').click()">
+                    <input type="file" id="xrayFile" accept="image/jpeg,image/png" style="display: none;">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">Puja una radiografia</div>
+                    <div class="upload-subtext">JPG o PNG · Opcional</div>
+                    <div id="xrayFileName" class="file-name hidden"></div>
+                </div>
+            </div>
+            
+            <!-- Analítica de Sang -->
+            <div class="card">
+                <h2 class="card-title">🩸 Analítica de Sang</h2>
+                
+                <!-- Opció 1: Pujar PDF -->
+                <div class="upload-zone" id="bloodZone" onclick="document.getElementById('bloodFile').click()" style="margin-bottom: 24px;">
+                    <input type="file" id="bloodFile" accept="application/pdf,image/jpeg,image/png" style="display: none;">
+                    <div class="upload-icon">📄</div>
+                    <div class="upload-text">Puja analítica (PDF)</div>
+                    <div class="upload-subtext">PDF, JPG o PNG · Opcional</div>
+                    <div id="bloodFileName" class="file-name hidden"></div>
+                </div>
+                
+                <div style="text-align: center; margin: 24px 0; color: var(--apple-gray-400); font-weight: 500;">
+                    o introdueix manualment
+                </div>
+                
+                <!-- Opció 2: Entrada manual -->
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label class="input-label">Hemoglobina (g/dL)</label>
+                        <input type="number" step="0.1" class="input-field" id="hemoglobin" placeholder="12.0 - 16.0">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Glòbuls blancs (/μL)</label>
+                        <input type="number" class="input-field" id="wbc" placeholder="4000 - 11000">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Plaquetes (/μL)</label>
+                        <input type="number" class="input-field" id="platelets" placeholder="150000 - 400000">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">PCR (mg/L)</label>
+                        <input type="number" step="0.1" class="input-field" id="crp" placeholder="0 - 10">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Colesterol (mg/dL)</label>
+                        <input type="number" class="input-field" id="cholesterol" placeholder="< 200">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Glucosa (mg/dL)</label>
+                        <input type="number" class="input-field" id="glucose" placeholder="70 - 100">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Ferritina (ng/mL)</label>
+                        <input type="number" class="input-field" id="ferritin" placeholder="20 - 200">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">ALT (U/L)</label>
+                        <input type="number" class="input-field" id="alt" placeholder="7 - 56">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">AST (U/L)</label>
+                        <input type="number" class="input-field" id="ast" placeholder="10 - 40">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Creatinina (mg/dL)</label>
+                        <input type="number" step="0.1" class="input-field" id="creatinine" placeholder="0.7 - 1.3">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Analyze Button -->
+            <button type="submit" class="btn btn-primary" id="analyzeBtn">
+                Analitzar amb IA
+            </button>
+        </form>
+        
+        <!-- Loading -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <div class="loading-text">Processant dades mèdiques...</div>
+        </div>
+        
+        <!-- Results -->
+        <div class="results" id="results">
+            <div class="results-header">
+                <h2 class="results-title">Resultats de l'Anàlisi</h2>
+                <div class="risk-badge" id="riskBadge"></div>
+            </div>
+            
+            <div class="result-card">
+                <h3 class="result-card-title">
+                    <span class="result-card-icon">🔍</span>
+                    Possible Condició
+                </h3>
+                <div class="result-card-content" id="condition"></div>
+            </div>
+            
+            <div class="result-card">
+                <h3 class="result-card-title">
+                    <span class="result-card-icon">📊</span>
+                    Evidències Detectades
+                </h3>
+                <ul class="result-list" id="evidence"></ul>
+            </div>
+            
+            <div class="result-card">
+                <h3 class="result-card-title">
+                    <span class="result-card-icon">💡</span>
+                    Recomanacions
+                </h3>
+                <ul class="result-list" id="recommendations"></ul>
+            </div>
+            
+            <div class="text-center">
+                <button class="btn btn-download" onclick="downloadReport()">
+                    📥 Descarregar Informe PDF
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // File upload handlers
+        document.getElementById('xrayFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('xrayFileName').textContent = '✓ ' + file.name;
+                document.getElementById('xrayFileName').classList.remove('hidden');
+                document.getElementById('xrayZone').classList.add('active');
+            }
+        });
+        
+        document.getElementById('bloodFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('bloodFileName').textContent = '✓ ' + file.name;
+                document.getElementById('bloodFileName').classList.remove('hidden');
+                document.getElementById('bloodZone').classList.add('active');
+            }
+        });
+        
+        // Form submission
+        document.getElementById('analysisForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const xrayFile = document.getElementById('xrayFile').files[0];
+            const bloodFile = document.getElementById('bloodFile').files[0];
+            
+            // Recollir dades manuals
+            const bloodData = {
+                hemoglobin: parseFloat(document.getElementById('hemoglobin').value) || null,
+                white_blood_cells: parseFloat(document.getElementById('wbc').value) || null,
+                platelets: parseFloat(document.getElementById('platelets').value) || null,
+                crp: parseFloat(document.getElementById('crp').value) || null,
+                cholesterol: parseFloat(document.getElementById('cholesterol').value) || null,
+                glucose: parseFloat(document.getElementById('glucose').value) || null,
+                ferritin: parseFloat(document.getElementById('ferritin').value) || null,
+                alt: parseFloat(document.getElementById('alt').value) || null,
+                ast: parseFloat(document.getElementById('ast').value) || null,
+                creatinine: parseFloat(document.getElementById('creatinine').value) || null
+            };
+            
+            // Verificar que hi ha almenys una entrada
+            const hasBloodData = Object.values(bloodData).some(v => v !== null);
+            
+            if (!xrayFile && !bloodFile && !hasBloodData) {
+                alert('Si us plau, proporciona almenys una radiografia o dades d\'analítica');
+                return;
+            }
+            
+            // Preparar FormData
+            const formData = new FormData();
+            if (xrayFile) formData.append('xray_file', xrayFile);
+            if (bloodFile) formData.append('blood_pdf', bloodFile);
+            if (hasBloodData) formData.append('blood_data', JSON.stringify(bloodData));
+            
+            // Mostrar loading
+            document.getElementById('analyzeBtn').disabled = true;
+            document.getElementById('loading').classList.add('active');
+            document.getElementById('results').classList.remove('active');
+            
+            try {
+                const response = await fetch('/api/analyze', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.combined_analysis) {
+                    displayResults(data.combined_analysis);
+                } else {
+                    alert('Error en l\'anàlisi');
+                }
+            } catch (error) {
+                alert('Error de connexió: ' + error.message);
+            } finally {
+                document.getElementById('analyzeBtn').disabled = false;
+                document.getElementById('loading').classList.remove('active');
+            }
+        });
+        
+        function displayResults(result) {
+            // Risk badge
+            const riskBadge = document.getElementById('riskBadge');
+            const riskIcons = {
+                'Baix': '✅',
+                'Moderat': '⚠️',
+                'Alt': '🚨'
+            };
+            riskBadge.innerHTML = `${riskIcons[result.risk_level]} Risc ${result.risk_level}`;
+            riskBadge.className = 'risk-badge risk-' + result.risk_level.toLowerCase();
+            
+            // Condition
+            document.getElementById('condition').innerHTML = `
+                <strong style="font-size: 24px; display: block; margin-bottom: 8px;">${result.condition}</strong>
+                <span style="color: var(--apple-gray-400);">
+                    Confiança: ${(result.confidence * 100).toFixed(1)}%
+                </span>
+            `;
+            
+            // Evidence
+            const evidenceList = document.getElementById('evidence');
+            evidenceList.innerHTML = '';
+            result.evidence.forEach(ev => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span class="result-list-icon">•</span>
+                    <span>${ev}</span>
+                `;
+                evidenceList.appendChild(li);
+            });
+            
+            // Recommendations
+            const recList = document.getElementById('recommendations');
+            recList.innerHTML = '';
+            result.recommendations.forEach(rec => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span class="result-list-icon">→</span>
+                    <span>${rec}</span>
+                `;
+                recList.appendChild(li);
+            });
+            
+            // Show results
+            document.getElementById('results').classList.add('active');
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        
+        function downloadReport() {
+            alert('Funcionalitat de descàrrega PDF en desenvolupament');
+            // TODO: Implementar generació de PDF
+        }
+    </script>
+</body>
+</html>

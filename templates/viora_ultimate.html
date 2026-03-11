@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viora - Medical AI Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --apple-white: #ffffff;
+            --apple-gray-50: #fafafa;
+            --apple-gray-100: #f5f5f7;
+            --apple-gray-200: #e8e8ed;
+            --apple-gray-300: #d2d2d7;
+            --apple-gray-400: #86868b;
+            --apple-gray-900: #1d1d1f;
+            --apple-blue: #0071e3;
+            --apple-green: #30d158;
+            --apple-orange: #ff9500;
+            --apple-red: #ff3b30;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--apple-gray-50);
+            color: var(--apple-gray-900);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* Navbar amb logo modern */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: saturate(180%) blur(20px);
+            border-bottom: 1px solid var(--apple-gray-200);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 20px;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .logo-container:hover {
+            transform: scale(1.05);
+        }
+        
+        .logo {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .logo-container:hover .logo {
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+            transform: rotate(5deg);
+        }
+        
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .logo-badge {
+            background: var(--apple-blue);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 80px 20px 60px;
+        }
+        
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 40px 0 60px;
+        }
+        
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--apple-gray-900) 0%, var(--apple-gray-400) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .hero p {
+            font-size: 19px;
+            color: var(--apple-gray-400);
+            font-weight: 400;
+        }
+        
+        /* Disclaimer */
+        .disclaimer {
+            background: #fff9e6;
+            border: 1px solid #ffe066;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin: 0 auto 40px;
+            max-width: 700px;
+            display: flex;
+            align-items: start;
+            gap: 12px;
+        }
+        
+        .disclaimer-text {
+            font-size: 14px;
+            color: #856404;
+            line-height: 1.5;
+        }
+        
+        /* Tabs Navigation */
+        .tabs-nav {
+            display: flex;
+            gap: 8px;
+            background: var(--apple-white);
+            padding: 8px;
+            border-radius: 12px;
+            margin-bottom: 32px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--apple-gray-200);
+            overflow-x: auto;
+        }
+        
+        .tab-button {
+            flex: 1;
+            min-width: 150px;
+            padding: 12px 20px;
+            border: none;
+            background: transparent;
+            color: var(--apple-gray-400);
+            font-size: 15px;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            white-space: nowrap;
+        }
+        
+        .tab-button:hover {
+            background: var(--apple-gray-100);
+            color: var(--apple-gray-900);
+        }
+        
+        .tab-button.active {
+            background: var(--apple-blue);
+            color: white;
+            box-shadow: 0 2px 8px rgba(0, 113, 227, 0.3);
+        }
+        
+        /* Scroll animations estil Apple */
+        .section {
+            opacity: 0;
+            transform: translateY(60px);
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+                        transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+        
+        .section-title {
+            font-size: 40px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-bottom: 16px;
+            color: var(--apple-gray-900);
+        }
+        
+        .section-subtitle {
+            font-size: 19px;
+            color: var(--apple-gray-400);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Feature images */
+        .feature-image {
+            width: 100%;
+            max-width: 500px;
+            margin: 32px auto;
+            border-radius: 20px;
+            box-shadow: var(--shadow-xl);
+            display: block;
+        }
+        
+        .image-placeholder {
+            width: 100%;
+            height: 300px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            margin: 32px auto;
+            box-shadow: var(--shadow-xl);
+        }
+        
+        /* Cards */
+        .card {
+            background: var(--apple-white);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--apple-gray-200);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            box-shadow: var(--shadow-md);
+        }
+        
+        .card-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* Input groups */
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .input-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--apple-gray-400);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .input-field {
+            padding: 12px 16px;
+            border: 1px solid var(--apple-gray-300);
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            background: var(--apple-white);
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: var(--apple-blue);
+            box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.1);
+        }
+        
+        /* Upload zones */
+        .upload-zone {
+            border: 2px dashed var(--apple-gray-300);
+            border-radius: 12px;
+            padding: 40px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: var(--apple-gray-50);
+        }
+        
+        .upload-zone:hover {
+            border-color: var(--apple-blue);
+            background: var(--apple-white);
+        }
+        
+        .upload-zone.active {
+            border-color: var(--apple-blue);
+            background: #e3f2fd;
+        }
+        
+        .upload-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+            opacity: 0.6;
+        }
+        
+        .upload-text {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--apple-gray-900);
+            margin-bottom: 6px;
+        }
+        
+        .upload-subtext {
+            font-size: 13px;
+            color: var(--apple-gray-400);
+        }
+        
+        .file-name {
+            margin-top: 12px;
+            padding: 6px 16px;
+            background: var(--apple-green);
+            color: white;
+            border-radius: 20px;
+            display: inline-block;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        .remove-file-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--apple-red);
+            color: white;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+        
+        .remove-file-btn:hover {
+            background: #d32f2f;
+            transform: scale(1.1);
+        }
+        
+        .remove-file-btn.hidden {
+            display: none;
+        }
+        
+        /* Reference values table */
+        .reference-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+        }
+        
+        .reference-table th {
+            text-align: left;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--apple-gray-400);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 12px;
+        }
+        
+        .reference-table td {
+            padding: 16px 12px;
+            background: var(--apple-gray-50);
+            font-size: 15px;
+        }
+        
+        .reference-table tr td:first-child {
+            border-radius: 10px 0 0 10px;
+            font-weight: 600;
+        }
+        
+        .reference-table tr td:last-child {
+            border-radius: 0 10px 10px 0;
+        }
+        
+        .value-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        .value-normal {
+            background: #d1f4e0;
+            color: #0d7a3f;
+        }
+        
+        .value-low {
+            background: #ffe5e5;
+            color: #c41e3a;
+        }
+        
+        .value-high {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 14px 32px;
+            border: none;
+            border-radius: 980px;
+            font-size: 17px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        
+        .btn-primary {
+            background: var(--apple-blue);
+            color: white;
+            width: 100%;
+            margin-top: 24px;
+            padding: 16px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            background: #0077ed;
+            transform: scale(1.02);
+        }
+        
+        .btn-primary:disabled {
+            background: var(--apple-gray-300);
+            cursor: not-allowed;
+        }
+        
+        /* Loading */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+        }
+        
+        .loading.active {
+            display: block;
+        }
+        
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 3px solid var(--apple-gray-200);
+            border-top-color: var(--apple-blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Results */
+        .results {
+            display: none;
+            margin-top: 40px;
+        }
+        
+        .results.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .risk-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 980px;
+            font-size: 17px;
+            font-weight: 600;
+            margin: 20px 0;
+        }
+        
+        .risk-baix {
+            background: #d1f4e0;
+            color: #0d7a3f;
+        }
+        
+        .risk-moderat {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .risk-alt {
+            background: #ffe5e5;
+            color: #c41e3a;
+        }
+        
+        .result-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .result-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--apple-gray-200);
+            display: flex;
+            align-items: start;
+            gap: 12px;
+        }
+        
+        .result-list li:last-child {
+            border-bottom: none;
+        }
+        
+        /* Comments */
+        .comment-card {
+            background: var(--apple-gray-50);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .comment-author {
+            font-weight: 600;
+            font-size: 15px;
+        }
+        
+        .comment-rating {
+            color: var(--apple-orange);
+        }
+        
+        .comment-text {
+            font-size: 14px;
+            color: var(--apple-gray-400);
+            line-height: 1.6;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .tabs-nav {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+            }
+            
+            .tab-button {
+                min-width: 120px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .input-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar amb logo modern -->
+    <nav class="navbar">
+        <div class="logo-container">
+            <div class="logo">🏥</div>
+            <div class="logo-text">Viora</div>
+            <span class="logo-badge">AI</span>
+        </div>
+    </nav>
+    
+    <!-- Container principal -->
+    <div class="container">
+        <!-- Hero -->
+        <div class="hero">
+            <h1>La teva salut, més clara que mai</h1>
+            <p>Intel·ligència artificial que entén el teu cos i t'ajuda a prendre millors decisions</p>
+        </div>
+        
+
+        
+        <!-- Tab 1: Informació Bàsica -->
+        <div class="tab-content active" id="tab0">
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Comença amb la teva informació</h2>
+                    <p class="section-subtitle">Ajuda'ns a personalitzar l'anàlisi amb les teves dades bàsiques</p>
+                </div>
+                
+                <div class="image-placeholder">👤</div>
+                
+                <div class="card">
+                    <div class="input-grid">
+                        <div class="input-group">
+                            <label class="input-label">Nom complet</label>
+                            <input type="text" class="input-field" id="patientName" placeholder="Nom del pacient">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Edat</label>
+                            <input type="number" class="input-field" id="patientAge" placeholder="Edat">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Sexe</label>
+                            <select class="input-field" id="patientGender">
+                                <option value="">Selecciona</option>
+                                <option value="home">Home</option>
+                                <option value="dona">Dona</option>
+                                <option value="altre">Altre</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="input-group" style="margin-top: 16px;">
+                        <label class="input-label">Historial mèdic breu</label>
+                        <textarea class="input-field" id="medicalHistory" rows="3" 
+                                  placeholder="Malalties cròniques, al·lèrgies, medicació actual..."></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Radiografia de Tòrax</h2>
+                    <p class="section-subtitle">Puja una imatge per detectar possibles anomalies pulmonars</p>
+                </div>
+                
+                <div class="image-placeholder">🫁</div>
+                
+                <div class="card">
+                    <div class="upload-zone" id="xrayZone" onclick="document.getElementById('xrayFile').click()" style="position: relative;">
+                        <input type="file" id="xrayFile" accept="image/jpeg,image/png" style="display: none;">
+                        <div class="upload-icon">📁</div>
+                        <div class="upload-text">Puja una radiografia</div>
+                        <div class="upload-subtext">JPG o PNG · Opcional</div>
+                        <div id="xrayFileName" class="file-name hidden"></div>
+                        <button type="button" id="removeXrayFile" class="remove-file-btn hidden" onclick="removeXrayFile(event)">✕</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Analítica de Sang</h2>
+                    <p class="section-subtitle">Introdueix els valors o puja el document per una anàlisi completa</p>
+                </div>
+                
+                <div class="image-placeholder">🩸</div>
+                
+                <div class="card">
+                    <div class="upload-zone" onclick="document.getElementById('bloodFile').click()" style="margin-bottom: 20px; position: relative;">
+                        <input type="file" id="bloodFile" accept="application/pdf,image/*" style="display: none;">
+                        <div class="upload-icon">📄</div>
+                        <div class="upload-text">Puja analítica (PDF/Imatge)</div>
+                        <div class="upload-subtext">S'extrauran automàticament els valors</div>
+                        <div id="bloodFileName" class="file-name hidden"></div>
+                        <button type="button" id="removeBloodFile" class="remove-file-btn hidden" onclick="removeBloodFile(event)">✕</button>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 20px 0; color: var(--apple-gray-400); font-weight: 500;">
+                        o introdueix manualment
+                    </div>
+                    
+                    <div class="input-grid">
+                        <div class="input-group">
+                            <label class="input-label">Hemoglobina (g/dL)</label>
+                            <input type="number" step="0.1" class="input-field blood-input" id="hemoglobin" placeholder="10.0 - 13.5">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Hematòcrit (%)</label>
+                            <input type="number" step="0.1" class="input-field blood-input" id="hematocrit" placeholder="32.0 - 41.0">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Leucòcits (/μL)</label>
+                            <input type="number" class="input-field blood-input" id="wbc" placeholder="4190 - 9680">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Plaquetes (/μL)</label>
+                            <input type="number" class="input-field blood-input" id="platelets" placeholder="150000 - 332000">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Glucosa (mg/dL)</label>
+                            <input type="number" step="0.1" class="input-field blood-input" id="glucose" placeholder="73.8 - 106">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">HbA1c (%)</label>
+                            <input type="number" step="0.1" class="input-field blood-input" id="hba1c" placeholder="< 5.7">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Creatinina (mg/dL)</label>
+                            <input type="number" step="0.01" class="input-field blood-input" id="creatinine" placeholder="0.70 - 1.20">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">AST/GOT (U/L)</label>
+                            <input type="number" class="input-field blood-input" id="ast" placeholder="< 50">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">ALT/GPT (U/L)</label>
+                            <input type="number" class="input-field blood-input" id="alt" placeholder="< 50">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">GGT (U/L)</label>
+                            <input type="number" class="input-field blood-input" id="ggt" placeholder="< 60">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Colesterol total (mg/dL)</label>
+                            <input type="number" class="input-field blood-input" id="cholesterol" placeholder="< 200">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">HDL (mg/dL)</label>
+                            <input type="number" step="0.1" class="input-field blood-input" id="hdl" placeholder="> 40">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">LDL (mg/dL)</label>
+                            <input type="number" class="input-field blood-input" id="ldl" placeholder="< 100">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Triglicèrids (mg/dL)</label>
+                            <input type="number" step="0.1" class="input-field blood-input" id="triglycerides" placeholder="< 150">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Ferritina (ng/mL)</label>
+                            <input type="number" class="input-field blood-input" id="ferritin" placeholder="30 - 400">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Vitamina D (ng/mL)</label>
+                            <input type="number" step="0.1" class="input-field blood-input" id="vitamin_d" placeholder="30 - 100">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Vitamina B12 (pg/mL)</label>
+                            <input type="number" class="input-field blood-input" id="vitamin_b12" placeholder="> 300">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">TSH (mUI/L)</label>
+                            <input type="number" step="0.01" class="input-field blood-input" id="tsh" placeholder="0.51 - 4.30">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Valors de Referència</h2>
+                    <p class="section-subtitle">Compara els teus resultats amb els rangs normals</p>
+                </div>
+                
+                <div class="card">
+                    <table class="reference-table" id="referenceTable">
+                        <thead>
+                            <tr>
+                                <th>Paràmetre</th>
+                                <th>Rang Normal</th>
+                                <th>Unitat</th>
+                                <th>El teu valor</th>
+                            </tr>
+                        </thead>
+                        <tbody id="referenceTableBody">
+                            <!-- Omplert dinàmicament -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="section">
+                <form id="analysisForm">
+                    <button type="submit" class="btn btn-primary" id="analyzeBtn">
+                        🔬 Analitzar amb IA
+                    </button>
+                </form>
+            </div>
+        </div>
+            
+            <!-- Loading -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <div style="font-size: 17px; color: var(--apple-gray-400); font-weight: 500;">
+                    Processant dades mèdiques...
+                </div>
+            </div>
+            
+            <!-- Results -->
+            <div class="results section" id="results">
+                <div style="text-align: center; margin-bottom: 40px;">
+                    <h2 style="font-size: 36px; font-weight: 700; margin-bottom: 12px;">Resultats de l'Anàlisi</h2>
+                    <div class="risk-badge" id="riskBadge"></div>
+                </div>
+                
+                <div class="card">
+                    <h3 class="card-title">🔍 Possible Condició</h3>
+                    <div id="condition" style="font-size: 18px;"></div>
+                </div>
+                
+                <div class="card">
+                    <h3 class="card-title">📊 Evidències Detectades</h3>
+                    <ul class="result-list" id="evidence"></ul>
+                </div>
+                
+                <div class="card">
+                    <h3 class="card-title">💡 Recomanacions</h3>
+                    <ul class="result-list" id="recommendations"></ul>
+                </div>
+                
+                <div class="text-center">
+                    <button class="btn btn-primary" style="width: auto;" onclick="alert('Funcionalitat PDF en desenvolupament')">
+                        📥 Descarregar Informe PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Comentaris Section -->
+        <div class="section" style="margin-top: 80px;">
+            <div class="section-header">
+                <h2 class="section-title">Què diuen els nostres usuaris</h2>
+                <p class="section-subtitle">Experiències reals de persones que han utilitzat Viora</p>
+            </div>
+            
+            <div class="card">
+                <h3 class="card-title">💬 Deixa el teu Feedback</h3>
+                <form id="commentForm">
+                    <div class="input-grid" style="grid-template-columns: 1fr 1fr;">
+                        <div class="input-group">
+                            <label class="input-label">Nom</label>
+                            <input type="text" class="input-field" id="commentName" required>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Email</label>
+                            <input type="email" class="input-field" id="commentEmail" required>
+                        </div>
+                    </div>
+                    <div class="input-group" style="margin-top: 16px;">
+                        <label class="input-label">Valoració</label>
+                        <div style="font-size: 32px; cursor: pointer;" id="ratingStars">
+                            <span onclick="setRating(1)">⭐</span>
+                            <span onclick="setRating(2)">⭐</span>
+                            <span onclick="setRating(3)">⭐</span>
+                            <span onclick="setRating(4)">⭐</span>
+                            <span onclick="setRating(5)">⭐</span>
+                        </div>
+                        <input type="hidden" id="commentRating" value="5">
+                    </div>
+                    <div class="input-group" style="margin-top: 16px;">
+                        <label class="input-label">Comentari</label>
+                        <textarea class="input-field" id="commentText" rows="4" required
+                                  placeholder="Comparteix la teva experiència amb Viora..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        Enviar Comentari
+                    </button>
+                </form>
+            </div>
+            
+            <div class="card">
+                <h3 class="card-title">📝 Comentaris Recents</h3>
+                <div id="commentsList">
+                    <p style="color: var(--apple-gray-400); text-align: center; padding: 20px;">
+                        Carregant comentaris...
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Disclaimer a baix -->
+        <div class="disclaimer" style="margin-top: 80px; margin-bottom: 40px;">
+            <div style="font-size: 20px;">⚠️</div>
+            <div class="disclaimer-text">
+                <strong>Avís Legal:</strong> Viora és una eina de suport clínic desenvolupada amb fins educatius i informatius. 
+                No substitueix el diagnòstic, tractament o consell d'un metge professional. Sempre consulta amb personal mèdic 
+                qualificat per a decisions relacionades amb la teva salut. Les prediccions de la IA són orientatives i poden 
+                contenir errors. En cas de dubte o símptomes greus, acudeix immediatament a un centre mèdic.
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Scroll animations estil Apple
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+        
+        // Observar totes les seccions
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.section').forEach(section => {
+                observer.observe(section);
+            });
+            
+            // Primera secció visible immediatament
+            const firstSection = document.querySelector('.section');
+            if (firstSection) {
+                firstSection.classList.add('visible');
+            }
+            
+            loadReferenceValues();
+            loadComments();
+        });
+        
+        let referenceValues = {};
+        
+        // Load reference values
+        async function loadReferenceValues() {
+            try {
+                const response = await fetch('/api/reference-values');
+                referenceValues = await response.json();
+                updateReferenceTable();
+            } catch (error) {
+                console.error('Error loading reference values:', error);
+            }
+        }
+        
+        // Update reference table
+        function updateReferenceTable() {
+            const tbody = document.getElementById('referenceTableBody');
+            tbody.innerHTML = '';
+            
+            const bloodInputs = {
+                'hemoglobin': document.getElementById('hemoglobin'),
+                'hematocrit': document.getElementById('hematocrit'),
+                'white_blood_cells': document.getElementById('wbc'),
+                'platelets': document.getElementById('platelets'),
+                'glucose': document.getElementById('glucose'),
+                'hba1c': document.getElementById('hba1c'),
+                'creatinine': document.getElementById('creatinine'),
+                'ast': document.getElementById('ast'),
+                'alt': document.getElementById('alt'),
+                'ggt': document.getElementById('ggt'),
+                'cholesterol': document.getElementById('cholesterol'),
+                'hdl': document.getElementById('hdl'),
+                'ldl': document.getElementById('ldl'),
+                'triglycerides': document.getElementById('triglycerides'),
+                'ferritin': document.getElementById('ferritin'),
+                'vitamin_d': document.getElementById('vitamin_d'),
+                'vitamin_b12': document.getElementById('vitamin_b12'),
+                'tsh': document.getElementById('tsh')
+            };
+            
+            for (const [key, ref] of Object.entries(referenceValues)) {
+                const row = document.createElement('tr');
+                const userValue = parseFloat(bloodInputs[key]?.value) || null;
+                
+                let status = 'Normal';
+                let statusClass = 'value-normal';
+                
+                if (userValue !== null) {
+                    if (userValue < ref.min) {
+                        status = 'Baix';
+                        statusClass = 'value-low';
+                    } else if (userValue > ref.max) {
+                        status = 'Alt';
+                        statusClass = 'value-high';
+                    }
+                }
+                
+                row.innerHTML = `
+                    <td>${ref.name}</td>
+                    <td>${ref.min} - ${ref.max}</td>
+                    <td>${ref.unit}</td>
+                    <td>
+                        ${userValue !== null 
+                            ? `<span class="value-badge ${statusClass}">${userValue} ${ref.unit} (${status})</span>`
+                            : '<span style="color: var(--apple-gray-400);">No introduït</span>'}
+                    </td>
+                `;
+                tbody.appendChild(row);
+            }
+        }
+        
+        // Update reference table when blood values change
+        document.querySelectorAll('.blood-input').forEach(input => {
+            input.addEventListener('input', () => {
+                updateReferenceTable();
+            });
+        });
+        
+        // File uploads
+        document.getElementById('xrayFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('xrayFileName').textContent = '✓ ' + file.name;
+                document.getElementById('xrayFileName').classList.remove('hidden');
+                document.getElementById('xrayZone').classList.add('active');
+                document.getElementById('removeXrayFile').classList.remove('hidden');
+            }
+        });
+        
+        document.getElementById('bloodFile').addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('bloodFileName').textContent = '⏳ Processant ' + file.name + '...';
+                document.getElementById('bloodFileName').classList.remove('hidden');
+                document.getElementById('removeBloodFile').classList.remove('hidden');
+                
+                // Intentar extreure dades automàticament
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                try {
+                    const response = await fetch('/api/extract-blood-data', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const data = await response.json();
+                    
+                    // Debug: mostrar text extret
+                    if (data.debug_text) {
+                        console.log('[DEBUG] Text extret del PDF:');
+                        console.log(data.debug_text);
+                    }
+                    
+                    if (data.status === 'success') {
+                        document.getElementById('bloodFileName').textContent = '✓ ' + file.name + ' - ' + data.message;
+                        
+                        // Omplir camps automàticament
+                        for (const [key, value] of Object.entries(data.values)) {
+                            const inputMap = {
+                                'hemoglobin': 'hemoglobin',
+                                'hematocrit': 'hematocrit',
+                                'white_blood_cells': 'wbc',
+                                'platelets': 'platelets',
+                                'glucose': 'glucose',
+                                'hba1c': 'hba1c',
+                                'creatinine': 'creatinine',
+                                'ast': 'ast',
+                                'alt': 'alt',
+                                'ggt': 'ggt',
+                                'cholesterol': 'cholesterol',
+                                'hdl': 'hdl',
+                                'ldl': 'ldl',
+                                'triglycerides': 'triglycerides',
+                                'ferritin': 'ferritin',
+                                'vitamin_d': 'vitamin_d',
+                                'vitamin_b12': 'vitamin_b12',
+                                'tsh': 'tsh'
+                            };
+                            
+                            const inputId = inputMap[key];
+                            if (inputId) {
+                                const input = document.getElementById(inputId);
+                                if (input) {
+                                    input.value = value;
+                                    input.style.background = '#e3f2fd';
+                                }
+                            }
+                        }
+                        
+                        // Actualitzar taula de referència
+                        updateReferenceTable();
+                        
+                        alert('✅ S\'han extret i omplert ' + Object.keys(data.values).length + ' paràmetres automàticament!');
+                    } else if (data.status === 'warning') {
+                        document.getElementById('bloodFileName').textContent = '⚠️ ' + file.name + ' - ' + data.message;
+                        console.warn('[WARNING] No s\'han trobat valors. Revisa la consola per veure el text extret.');
+                        alert(data.message + '\n\nRevisa la consola del navegador (F12) per veure el text extret del PDF.');
+                    } else {
+                        document.getElementById('bloodFileName').textContent = '❌ Error: ' + data.message;
+                        alert('Error: ' + data.message);
+                    }
+                } catch (error) {
+                    document.getElementById('bloodFileName').textContent = '❌ Error processant fitxer';
+                    alert('Error processant el fitxer: ' + error.message);
+                }
+            }
+        });
+        
+        function removeXrayFile(event) {
+            event.stopPropagation();
+            document.getElementById('xrayFile').value = '';
+            document.getElementById('xrayFileName').classList.add('hidden');
+            document.getElementById('xrayZone').classList.remove('active');
+            document.getElementById('removeXrayFile').classList.add('hidden');
+        }
+        
+        function removeBloodFile(event) {
+            event.stopPropagation();
+            document.getElementById('bloodFile').value = '';
+            document.getElementById('bloodFileName').classList.add('hidden');
+            document.getElementById('removeBloodFile').classList.add('hidden');
+            
+            // Netejar camps omplerts automàticament
+            const inputs = document.querySelectorAll('.blood-input');
+            inputs.forEach(input => {
+                if (input.style.background === 'rgb(227, 242, 253)') {
+                    input.value = '';
+                    input.style.background = '';
+                }
+            });
+            
+            updateReferenceTable();
+        }
+        
+        // Analysis form
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('analysisForm');
+            
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                console.log('Form submitted!');
+                
+                const xrayFile = document.getElementById('xrayFile').files[0];
+                const bloodFile = document.getElementById('bloodFile').files[0];
+                
+                const bloodData = {
+                    hemoglobin: parseFloat(document.getElementById('hemoglobin').value) || null,
+                    hematocrit: parseFloat(document.getElementById('hematocrit').value) || null,
+                    white_blood_cells: parseFloat(document.getElementById('wbc').value) || null,
+                    platelets: parseFloat(document.getElementById('platelets').value) || null,
+                    glucose: parseFloat(document.getElementById('glucose').value) || null,
+                    hba1c: parseFloat(document.getElementById('hba1c').value) || null,
+                    creatinine: parseFloat(document.getElementById('creatinine').value) || null,
+                    ast: parseFloat(document.getElementById('ast').value) || null,
+                    alt: parseFloat(document.getElementById('alt').value) || null,
+                    ggt: parseFloat(document.getElementById('ggt').value) || null,
+                    cholesterol: parseFloat(document.getElementById('cholesterol').value) || null,
+                    hdl: parseFloat(document.getElementById('hdl').value) || null,
+                    ldl: parseFloat(document.getElementById('ldl').value) || null,
+                    triglycerides: parseFloat(document.getElementById('triglycerides').value) || null,
+                    ferritin: parseFloat(document.getElementById('ferritin').value) || null,
+                    vitamin_d: parseFloat(document.getElementById('vitamin_d').value) || null,
+                    vitamin_b12: parseFloat(document.getElementById('vitamin_b12').value) || null,
+                    tsh: parseFloat(document.getElementById('tsh').value) || null
+                };
+                
+                const hasBloodData = Object.values(bloodData).some(v => v !== null);
+                
+                if (!xrayFile && !bloodFile && !hasBloodData) {
+                    alert('Si us plau, proporciona almenys una radiografia o dades d\'analítica de sang');
+                    return;
+                }
+                
+                // Missatge informatiu segons el que s'analitza
+                let analysisType = '';
+                if (xrayFile && (hasBloodData || bloodFile)) {
+                    analysisType = 'Analitzant radiografia i analítica de sang...';
+                } else if (xrayFile) {
+                    analysisType = 'Analitzant només radiografia de tòrax...';
+                } else {
+                    analysisType = 'Analitzant només analítica de sang...';
+                }
+                
+                document.querySelector('.loading div:last-child').textContent = analysisType;
+                
+                const patientInfo = {
+                    name: document.getElementById('patientName').value,
+                    age: document.getElementById('patientAge').value,
+                    gender: document.getElementById('patientGender').value,
+                    medical_history: document.getElementById('medicalHistory').value
+                };
+                
+                const formData = new FormData();
+                if (xrayFile) formData.append('xray_file', xrayFile);
+                if (bloodFile) formData.append('blood_pdf', bloodFile);
+                if (hasBloodData) formData.append('blood_data', JSON.stringify(bloodData));
+                formData.append('patient_info', JSON.stringify(patientInfo));
+                
+                document.getElementById('analyzeBtn').disabled = true;
+                document.getElementById('loading').classList.add('active');
+                document.getElementById('results').classList.remove('active');
+                
+                try {
+                    console.log('Sending request...');
+                    const response = await fetch('/api/analyze', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    console.log('Response received:', response.status);
+                    const data = await response.json();
+                    console.log('Data:', data);
+                    
+                    if (data.combined_analysis) {
+                        displayResults(data.combined_analysis);
+                    } else {
+                        alert('Error: No s\'han rebut resultats');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error: ' + error.message);
+                } finally {
+                    document.getElementById('analyzeBtn').disabled = false;
+                    document.getElementById('loading').classList.remove('active');
+                }
+            });
+        });
+        
+        function displayResults(result) {
+            const riskIcons = {
+                'Baix': '✅',
+                'Moderat': '⚠️',
+                'Alt': '🚨'
+            };
+            
+            document.getElementById('riskBadge').innerHTML = `${riskIcons[result.risk_level]} Risc ${result.risk_level}`;
+            document.getElementById('riskBadge').className = 'risk-badge risk-' + result.risk_level.toLowerCase();
+            
+            // Diagnòstic professional
+            let diagnosticText = `
+                <div style="background: var(--apple-gray-50); padding: 20px; border-radius: 12px; margin-bottom: 16px;">
+                    <strong style="font-size: 28px; display: block; margin-bottom: 12px; color: var(--apple-gray-900);">
+                        ${result.condition}
+                    </strong>
+                    <div style="color: var(--apple-gray-400); font-size: 15px;">
+                        Confiança del diagnòstic: ${(result.confidence * 100).toFixed(1)}%
+                    </div>
+                </div>
+            `;
+            
+            // Afegir gravetat
+            let severityText = '';
+            if (result.risk_level === 'Alt') {
+                severityText = `
+                    <div style="background: #ffe5e5; padding: 16px; border-radius: 10px; border-left: 4px solid #dc3545; margin-bottom: 16px;">
+                        <strong style="color: #c41e3a;">⚠️ Gravetat Alta</strong>
+                        <p style="margin: 8px 0 0 0; color: #721c24;">
+                            Es recomana consulta mèdica urgent. Alguns paràmetres estan fora dels rangs normals i requereixen atenció immediata.
+                        </p>
+                    </div>
+                `;
+            } else if (result.risk_level === 'Moderat') {
+                severityText = `
+                    <div style="background: #fff3cd; padding: 16px; border-radius: 10px; border-left: 4px solid #ffc107; margin-bottom: 16px;">
+                        <strong style="color: #856404;">⚠️ Gravetat Moderada</strong>
+                        <p style="margin: 8px 0 0 0; color: #856404;">
+                            Es recomana consulta amb el metge de família. Alguns valors requereixen seguiment i possibles ajustos.
+                        </p>
+                    </div>
+                `;
+            } else {
+                severityText = `
+                    <div style="background: #d1f4e0; padding: 16px; border-radius: 10px; border-left: 4px solid #28a745; margin-bottom: 16px;">
+                        <strong style="color: #0d7a3f;">✅ Gravetat Baixa</strong>
+                        <p style="margin: 8px 0 0 0; color: #0d7a3f;">
+                            Els paràmetres estan majoritàriament dins de la normalitat. Mantenir hàbits saludables.
+                        </p>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('condition').innerHTML = diagnosticText + severityText;
+            
+            // Evidències
+            const evidenceList = document.getElementById('evidence');
+            evidenceList.innerHTML = '';
+            result.evidence.forEach(ev => {
+                const li = document.createElement('li');
+                li.innerHTML = `<span style="color: var(--apple-blue); font-size: 18px;">•</span><span>${ev}</span>`;
+                evidenceList.appendChild(li);
+            });
+            
+            // Recomanacions i tractaments
+            const recList = document.getElementById('recommendations');
+            recList.innerHTML = '';
+            result.recommendations.forEach((rec, index) => {
+                const li = document.createElement('li');
+                const icon = rec.includes('urgent') || rec.includes('⚠️') ? '🚨' : 
+                            rec.includes('Consulta') ? '👨‍⚕️' : 
+                            rec.includes('Dieta') || rec.includes('dieta') ? '🥗' : 
+                            rec.includes('Exercici') || rec.includes('exercici') ? '🏃' : 
+                            rec.includes('Suplementació') || rec.includes('suplementació') ? '💊' : '→';
+                li.innerHTML = `<span style="color: var(--apple-blue); font-size: 18px;">${icon}</span><span>${rec}</span>`;
+                recList.appendChild(li);
+            });
+            
+            // Mostrar resultats amb animació
+            document.getElementById('results').classList.add('active', 'visible');
+            
+            // Scroll suau als resultats
+            setTimeout(() => {
+                document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 300);
+        }
+        
+        // Rating system
+        function setRating(rating) {
+            document.getElementById('commentRating').value = rating;
+            const stars = document.querySelectorAll('#ratingStars span');
+            stars.forEach((star, index) => {
+                star.style.opacity = index < rating ? '1' : '0.3';
+            });
+        }
+        
+        // Comment form
+        document.getElementById('commentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const comment = {
+                name: document.getElementById('commentName').value,
+                email: document.getElementById('commentEmail').value,
+                comment: document.getElementById('commentText').value,
+                rating: parseInt(document.getElementById('commentRating').value)
+            };
+            
+            try {
+                const response = await fetch('/api/comments', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(comment)
+                });
+                
+                const data = await response.json();
+                alert('Comentari enviat! Serà revisat abans de publicar-se.');
+                this.reset();
+                setRating(5);
+            } catch (error) {
+                alert('Error enviant comentari: ' + error.message);
+            }
+        });
+        
+        // Load comments
+        async function loadComments() {
+            try {
+                const response = await fetch('/api/comments');
+                const comments = await response.json();
+                
+                const container = document.getElementById('commentsList');
+                
+                if (comments.length === 0) {
+                    container.innerHTML = '<p style="color: var(--apple-gray-400); text-align: center; padding: 20px;">Encara no hi ha comentaris aprovats.</p>';
+                    return;
+                }
+                
+                container.innerHTML = comments.map(c => `
+                    <div class="comment-card">
+                        <div class="comment-header">
+                            <div class="comment-author">${c.name}</div>
+                            <div class="comment-rating">${'⭐'.repeat(c.rating)}</div>
+                        </div>
+                        <div class="comment-text">${c.comment}</div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading comments:', error);
+            }
+        }
+        
+        // Initialize
+        setRating(5);
+    </script>
+</body>
+</html>
