@@ -326,148 +326,307 @@ def analyze_blood_data(data: Dict) -> Dict:
     }
 
 def extract_blood_values_from_text(text: str) -> Dict:
-    """Extreu valors d'analítica de sang d'un text OCR amb patrons millorats"""
+    """
+    Extreu valors d'analítica de sang amb detecció ULTRA flexible
+    Segueix les normes de transcripció literal del document
+    """
     values = {}
     
-    # Normalitzar text: eliminar salts de línia dins de paraules
-    text = text.replace('\n', ' ').replace('\r', ' ')
-    text = re.sub(r'\s+', ' ', text)  # Múltiples espais a un sol espai
+    print(f"\n{'='*70}")
+    print(f"[DEBUG] INICI EXTRACCIÓ - Text de {len(text)} caràcters")
+    print(f"{'='*70}")
     
-    print(f"\n[DEBUG] Buscant valors al text normalitzat...")
+    # Preparar text per anàlisi
+    text_lower = text.lower()
+    lines = text.split('\n')
+    print(f"[DEBUG] Document amb {len(lines)} línies")
     
-    # Patrons MOLT més flexibles i específics per al format del PDF mèdic
-    patterns = {
+    # Funció per validar si un valor és vàlid (no és any, codi, etc.)
+    def is_valid_value(value: float, param_type: str) -> bool:
+        """Valida que el valor estigui dins de rangs raonables"""
+        ranges = {
+            'hemoglobin': (5, 25),
+            'hematocrit': (20, 60),
+            'white_blood_cells': (0.5, 50),
+            'neutrophils': (100, 15000),
+            'lymphocytes': (100, 10000),
+            'monocytes': (0, 3000),
+            'eosinophils': (0, 2000),
+            'basophils': (0, 500),
+            'platelets': (10, 1000),
+            'glucose': (30, 600),
+            'hba1c': (3, 20),
+            'creatinine': (0.3, 15),
+            'uric_acid': (1, 20),
+            'ast': (5, 5000),
+            'alt': (5, 5000),
+            'ggt': (5, 5000),
+            'albumin': (1, 10),
+            'bilirubin': (0.1, 30),
+            'calcium': (5, 15),
+            'iron': (10, 500),
+            'transferrin': (100, 500),
+            'ferritin': (5, 5000),
+            'cholesterol': (50, 500),
+            'hdl': (10, 200),
+            'ldl': (10, 300),
+            'triglycerides': (20, 1000),
+            'sodium': (120, 160),
+            'potassium': (2, 8),
+            'ige': (0, 5000),
+            'vitamin_d': (5, 200),
+            'vitamin_b12': (100, 5000),
+            'folic_acid': (1, 50),
+            'tsh': (0.01, 50),
+            't4_free': (0.1, 10),
+            't3_free': (0.5, 10),
+            'testosterone': (10, 2000),
+        }
+        
+        if param_type in ranges:
+            min_val, max_val = ranges[param_type]
+            is_valid = min_val <= value <= max_val
+            if not is_valid:
+                print(f"    ⚠️  Valor {value} fora de rang per {param_type} ({min_val}-{max_val})")
+            return is_valid
+        return True
+    
+    # ESTRATÈGIA 1: Patrons ULTRA flexibles amb [^0-9]{0,100}
+    # Això permet trobar números fins i tot amb molt text entremig
+    ultra_patterns = {
         'hemoglobin': [
-            r'hemoglobin[aíi]?\s*:?\s*\*?\s*(\d+[.,]\d+)\s*g/dl',
-            r'hb\s*:?\s*\*?\s*(\d+[.,]\d+)\s*g',
+            r'hemoglobin[aíi]?[^0-9]{0,100}(\d+[.,]\d+)[^0-9]{0,20}g[/\s]*d?l',
+            r'\bhb\b[^0-9]{0,50}(\d+[.,]\d+)',
         ],
         'hematocrit': [
-            r'hematocrit[oó]?\s*:?\s*\*?\s*(\d+[.,]\d+)\s*%',
+            r'hematocrit[oó]?[^0-9]{0,100}(\d+[.,]\d+)[^0-9]{0,20}%',
+            r'hto[^0-9]{0,50}(\d+[.,]\d+)',
         ],
         'white_blood_cells': [
-            r'leucocit[eos]?\s*:?\s*\*?\s*(\d+[.,]?\d*)\s*(?:10\s*exp\s*9|10\^?exp9)',
-            r'leucocitos?\s*:?\s*\*?\s*(\d+[.,]?\d*)\s*(?:10\s*exp\s*9|10\^?exp9)',
+            r'leucocit[eos]?[^0-9]{0,100}(\d+[.,]?\d*)[^0-9]{0,50}(?:10\s*exp|x\s*10|e\+?0?9)',
+            r'wbc[^0-9]{0,50}(\d+[.,]?\d*)',
+            r'gl[oó]bul[eos]?\s+blanc[eos]?[^0-9]{0,100}(\d+)',
         ],
         'neutrophils': [
-            r'neutr[oó]fil[eos]?\s+segmentad[eo]s?\s*:?\s*\*?\s*(\d+)\s*cel',
+            r'neutr[oó]fil[eos]?[^0-9]{0,100}(\d+)[^0-9]{0,30}cel',
+            r'neutrophils?[^0-9]{0,50}(\d+)',
         ],
         'lymphocytes': [
-            r'linfocit[eos]?\s*:?\s*\*?\s*(\d+)\s*cel',
+            r'linfocit[eos]?[^0-9]{0,100}(\d+)[^0-9]{0,30}cel',
+            r'lymphocytes?[^0-9]{0,50}(\d+)',
         ],
         'monocytes': [
-            r'monocit[eos]?\s*:?\s*\*?\s*(\d+)\s*cel',
+            r'monocit[eos]?[^0-9]{0,100}(\d+)[^0-9]{0,30}cel',
         ],
         'eosinophils': [
-            r'eosin[oó]fil[eos]?\s*:?\s*\*?\s*(\d+)\s*cel',
+            r'eosin[oó]fil[eos]?[^0-9]{0,100}(\d+)[^0-9]{0,30}cel',
         ],
         'basophils': [
-            r'bas[oó]fil[eos]?\s*:?\s*\*?\s*(\d+[.,]?\d*)\s*cel',
+            r'bas[oó]fil[eos]?[^0-9]{0,100}(\d+[.,]?\d*)[^0-9]{0,30}cel',
         ],
         'platelets': [
-            r'plaquet[ae]s?\s*:?\s*\*?\s*(\d+)\s*(?:10\s*exp\s*9|10\^?exp9)',
+            r'plaquet[ae]s?[^0-9]{0,100}(\d+)[^0-9]{0,50}(?:10\s*exp|x\s*10|e\+?0?9)',
+            r'plt[^0-9]{0,50}(\d+)',
         ],
         'glucose': [
-            r'glucos[ae]?\s*,?\s*suero\s*.*?resultado\s*:?\s*\*?\s*(\d+)\s*mg/dl',
-            r'glucos[ae]?\s*:?\s*\*?\s*(\d+)\s*mg/dl',
+            r'glucos[ae]?[^0-9]{0,100}(\d+)[^0-9]{0,30}mg[/\s]*d?l',
         ],
         'hba1c': [
-            r'hemoglobin[aí]?\s+a1c\s*%?\s*:?\s*\*?\s*(\d+[.,]\d+)\s*%',
-            r'hemoglobin[aí]?\s+glicosilad[ae]?\s*.*?resultado\s*:?\s*(\d+[.,]\d+)\s*%',
+            r'hemoglobin[aí]?\s+(?:a1c|glicosilad[ae]?)[^0-9]{0,100}(\d+[.,]\d+)[^0-9]{0,20}%',
+            r'hba1c[^0-9]{0,50}(\d+[.,]\d+)',
         ],
         'creatinine': [
-            r'creatinin[ae]?\s*,?\s*suero\s*.*?resultado\s*:?\s*(\d+[.,]\d+)\s*mg/dl',
+            r'creatinin[ae]?[^0-9]{0,100}(\d+[.,]\d+)[^0-9]{0,30}mg[/\s]*d?l',
         ],
         'uric_acid': [
-            r'[aá]cid[eo]?\s+[uú]ric[eo]?\s*\(?urato\)?\s*,?\s*suero\s*.*?resultado\s*:?\s*(\d+[.,]\d+)',
+            r'[aá]cid[eo]?\s+[uú]ric[eo]?[^0-9]{0,100}(\d+[.,]\d+)',
+            r'urato[^0-9]{0,50}(\d+[.,]\d+)',
         ],
         'ast': [
-            r'aspartato?\s+aminotransferasa\s*\(got/ast\)\s*,?\s*suero\s*.*?resultado\s*:?\s*\*?\s*(\d+[.,]?\d*)\s*u/l',
-            r'(?:ast|got)\s*:?\s*\*?\s*(\d+)\s*u/l',
+            r'(?:ast|got|aspartat[eo])[^0-9]{0,100}(\d+[.,]?\d*)[^0-9]{0,30}u[/\s]*l',
         ],
         'alt': [
-            r'alanin[ae]?\s+aminotransferasa\s*\(gpt/alt\)\s*,?\s*suero\s*.*?resultado\s*:?\s*(\d+[.,]\d+)\s*u/l',
+            r'(?:alt|gpt|alanin[ae]?)[^0-9]{0,100}(\d+[.,]\d+)[^0-9]{0,30}u[/\s]*l',
         ],
         'ggt': [
-            r'gamma\s+glutamil\s+transferasa\s*\(ggt\)\s*,?\s*suero\s*.*?resultado\s*:?\s*(\d+[.,]\d+)\s*u/l',
+            r'ggt[^0-9]{0,100}(\d+[.,]\d+)[^0-9]{0,30}u[/\s]*l',
+            r'gamma[^0-9]{0,100}(\d+[.,]\d+)[^0-9]{0,30}u[/\s]*l',
         ],
         'albumin': [
-            r'alb[uú]min[ae]?\s*,?\s*suero\s*.*?resultado\s*:?\s*(\d+[.,]\d+)',
+            r'alb[uú]min[ae]?[^0-9]{0,100}(\d+[.,]\d+)',
         ],
         'bilirubin': [
-            r'bilirrubina\s+total\s*,?\s*suero\s*.*?resultado\s*:?\s*(\d+[.,]\d+)',
+            r'bilirrubina[^0-9]{0,100}(\d+[.,]\d+)',
         ],
         'calcium': [
-            r'calci[eo]?\s*,?\s*suero\s*.*?resultado\s*:?\s*(\d+[.,]\d+)',
+            r'calci[eo]?[^0-9]{0,100}(\d+[.,]\d+)',
         ],
         'iron': [
-            r'hierro\s*\(ii\+iii\)\s*,?\s*suero\s*.*?resultado\s*:?\s*(\d+[.,]\d+)',
+            r'hierro[^0-9]{0,100}(\d+[.,]?\d*)',
+            r'ferro[^0-9]{0,100}(\d+[.,]?\d*)',
         ],
         'transferrin': [
-            r'transferrina\s*\(?siderofilina\)?\s*,?\s*suero\s*.*?resultado\s*:?\s*(\d+)',
+            r'transferrina[^0-9]{0,100}(\d+)',
         ],
         'ferritin': [
-            r'ferritin[ae]?\s*,?\s*suero\s*.*?resultado\s*:?\s*(\d+[.,]?\d*)',
+            r'ferritin[ae]?[^0-9]{0,100}(\d+[.,]?\d*)',
         ],
         'cholesterol': [
-            r'colesterol\s*,?\s*suero\s*.*?resultado\s*:?\s*\*?\s*(\d+)\s*mg/dl',
+            r'colesterol(?!\s+(?:hdl|ldl))[^0-9]{0,100}(\d+)[^0-9]{0,30}mg[/\s]*d?l',
         ],
         'hdl': [
-            r'colesterol\s+hdl\s*,?\s*suero\s*.*?resultado\s*:?\s*(\d+[.,]\d+)',
+            r'(?:hdl|colesterol\s+hdl)[^0-9]{0,100}(\d+[.,]\d+)',
         ],
         'ldl': [
-            r'colesterol\s+ldl\s*,?\s*suero\s*.*?resultado\s*:?\s*(\d+[.,]?\d*)',
+            r'(?:ldl|colesterol\s+ldl)[^0-9]{0,100}(\d+[.,]?\d*)',
         ],
         'triglycerides': [
-            r'trigl[ií]c[eé]rid[eo]s?\s*,?\s*suero\s*.*?resultado\s*:?\s*(\d+[.,]\d+)',
+            r'trigl[ií]c[eé]rid[eo]s?[^0-9]{0,100}(\d+[.,]\d+)',
         ],
         'sodium': [
-            r'sodio\s+ion\s*,?\s*suero\s*.*?resultado\s*:?\s*(\d+)',
+            r'sodi[eo]?[^0-9]{0,100}(\d+)',
         ],
         'potassium': [
-            r'potasio\s+ion\s*,?\s*suero\s*.*?resultado\s*:?\s*(\d+[.,]\d+)',
+            r'potasi[eo]?[^0-9]{0,100}(\d+[.,]\d+)',
         ],
         'ige': [
-            r'inmunoglobulina\s+e\s*\(ige\)\s*,?\s*suero\s*.*?resultado\s*:?\s*(\d+[.,]\d+)',
+            r'inmunoglobulina\s+e[^0-9]{0,100}(\d+[.,]?\d*)',
+            r'\bige\b[^0-9]{0,50}(\d+[.,]?\d*)',
         ],
         'vitamin_d': [
-            r'vitamina\s+d\s*\(25-oh-colecalciferol\)\s*,?\s*suero\s*.*?resultado\s*:?\s*(\d+[.,]\d+)',
+            r'vitamina\s+d[^0-9]{0,100}(\d+[.,]\d+)',
+            r'25[- ]oh[^0-9]{0,50}(\d+[.,]\d+)',
         ],
         'vitamin_b12': [
-            r'vitamina\s+b12\s*,?\s*suero\s*.*?resultado\s*:?\s*(\d+[.,]?\d*)',
+            r'vitamina\s+b12[^0-9]{0,100}(\d+[.,]?\d*)',
+            r'\bb12\b[^0-9]{0,50}(\d+[.,]?\d*)',
         ],
         'folic_acid': [
-            r'[aá]cid[eo]?\s+f[oó]lic[eo]\s*.*?resultado\s*:?\s*\*?\s*(\d+[.,]\d+)',
+            r'[aá]cid[eo]?\s+f[oó]lic[eo][^0-9]{0,100}(\d+[.,]\d+)',
         ],
         'tsh': [
-            r'tsh\s*.*?resultado\s*:?\s*(\d+[.,]\d+)',
+            r'\btsh\b[^0-9]{0,100}(\d+[.,]\d+)',
         ],
         't4_free': [
-            r't4\s+libre\s*.*?resultado\s*:?\s*(\d+[.,]\d+)',
+            r't4\s+libre[^0-9]{0,100}(\d+[.,]\d+)',
+            r't4\s+free[^0-9]{0,100}(\d+[.,]\d+)',
         ],
         't3_free': [
-            r't3\s+libre\s*.*?resultado\s*:?\s*(\d+[.,]\d+)',
+            r't3\s+libre[^0-9]{0,100}(\d+[.,]\d+)',
+            r't3\s+free[^0-9]{0,100}(\d+[.,]\d+)',
         ],
         'testosterone': [
-            r'testosterona\s*,?\s*suero\s*.*?resultado\s*:?\s*(\d+[.,]?\d*)',
+            r'testosterona[^0-9]{0,100}(\d+[.,]?\d*)',
         ],
     }
     
-    text_lower = text.lower()
-    
-    # Intentar cada patró per cada paràmetre
-    for key, pattern_list in patterns.items():
+    print(f"\n[ESTRATÈGIA 1] Patrons ultra-flexibles...")
+    for key, pattern_list in ultra_patterns.items():
+        if key in values:
+            continue  # Ja trobat
+        
         for pattern in pattern_list:
             match = re.search(pattern, text_lower, re.IGNORECASE | re.DOTALL)
             if match:
                 try:
-                    # Convertir comes a punts
                     value_str = match.group(1).replace(',', '.')
                     value = float(value_str)
-                    values[key] = value
-                    print(f"  ✓ {key} = {value}")
-                    break  # Si trobem un valor, no cal provar més patrons
+                    
+                    if is_valid_value(value, key):
+                        values[key] = value
+                        print(f"  ✅ {key} = {value} (patró: {pattern[:50]}...)")
+                        break
                 except Exception as e:
-                    print(f"  ✗ Error convertint {key}: {e}")
+                    print(f"  ❌ Error convertint {key}: {e}")
+    
+    # ESTRATÈGIA 2: Anàlisi línia per línia (per taules)
+    print(f"\n[ESTRATÈGIA 2] Anàlisi línia per línia...")
+    for i, line in enumerate(lines):
+        line_lower = line.lower().strip()
+        if not line_lower or len(line_lower) < 5:
+            continue
+        
+        # Buscar números a la línia
+        numbers = re.findall(r'\d+[.,]\d+|\d+', line_lower)
+        if not numbers:
+            continue
+        
+        # Identificar paràmetre per paraules clau
+        param_keywords = {
+            'hemoglobin': ['hemoglobin', 'hb'],
+            'hematocrit': ['hematocrit', 'hto'],
+            'white_blood_cells': ['leucocit', 'wbc', 'globul blanc'],
+            'neutrophils': ['neutrofil', 'neutrophil'],
+            'lymphocytes': ['linfocit', 'lymphocyte'],
+            'monocytes': ['monocit', 'monocyte'],
+            'eosinophils': ['eosinofil', 'eosinophil'],
+            'basophils': ['basofil', 'basophil'],
+            'platelets': ['plaquet', 'plt'],
+            'glucose': ['glucos', 'glucose'],
+            'hba1c': ['hba1c', 'a1c', 'glicosilad'],
+            'creatinine': ['creatinin'],
+            'uric_acid': ['acid uric', 'urato'],
+            'ast': ['ast', 'got', 'aspartat'],
+            'alt': ['alt', 'gpt', 'alanin'],
+            'ggt': ['ggt', 'gamma'],
+            'cholesterol': ['colesterol total'],
+            'hdl': ['hdl'],
+            'ldl': ['ldl'],
+            'triglycerides': ['triglicerid'],
+            'ferritin': ['ferritin'],
+            'vitamin_d': ['vitamina d', '25-oh'],
+            'vitamin_b12': ['vitamina b12', 'b12'],
+            'tsh': ['tsh'],
+            'testosterone': ['testosterona'],
+        }
+        
+        for param, keywords in param_keywords.items():
+            if param in values:
+                continue
+            
+            if any(kw in line_lower for kw in keywords):
+                # Trobar el número més proper
+                for num_str in numbers:
+                    try:
+                        value = float(num_str.replace(',', '.'))
+                        if is_valid_value(value, param):
+                            values[param] = value
+                            print(f"  ✅ {param} = {value} (línia {i+1}: {line[:60]}...)")
+                            break
+                    except:
+                        pass
+    
+    # ESTRATÈGIA 3: Cerca de números després de paraules clau (molt permissiva)
+    print(f"\n[ESTRATÈGIA 3] Cerca permissiva de números...")
+    simple_keywords = {
+        'hemoglobin': r'(?:hemoglobin[aí]?|hb)\D{0,200}?(\d+[.,]\d+)',
+        'glucose': r'glucos[ae]?\D{0,200}?(\d+[.,]?\d*)',
+        'cholesterol': r'colesterol(?!\s+(?:hdl|ldl))\D{0,200}?(\d+)',
+        'creatinine': r'creatinin[ae]?\D{0,200}?(\d+[.,]\d+)',
+        'ast': r'(?:ast|got)\D{0,200}?(\d+)',
+        'alt': r'(?:alt|gpt)\D{0,200}?(\d+)',
+    }
+    
+    for key, pattern in simple_keywords.items():
+        if key in values:
+            continue
+        
+        match = re.search(pattern, text_lower, re.IGNORECASE)
+        if match:
+            try:
+                value = float(match.group(1).replace(',', '.'))
+                if is_valid_value(value, key):
+                    values[key] = value
+                    print(f"  ✅ {param} = {value} (cerca permissiva)")
+            except:
+                pass
+    
+    print(f"\n{'='*70}")
+    print(f"[RESULTAT FINAL] S'han extret {len(values)} paràmetres:")
+    for key, value in values.items():
+        ref = REFERENCE_VALUES.get(key, {})
+        print(f"  • {ref.get('name', key)}: {value} {ref.get('unit', '')}")
+    print(f"{'='*70}\n")
     
     return values
 
